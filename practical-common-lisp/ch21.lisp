@@ -2,6 +2,10 @@
 
 Programming in the Large: Packages and Symbols
 
+ANNOUNCEMENT: All notes are available at the following github repo:
+
+https://github.com/AtlantaFP/cl-study-group.git
+
 * Agenda
   * Symbols
   * Packages
@@ -11,6 +15,9 @@ Programming in the Large: Packages and Symbols
   * ANSI Common Lisp by Paul Graham Ch. 8 on Symbols
   * Ch. 21 of Practical Common Lisp
   * Complete Idiot's Guide to Packages (http://www.flownet.com/gat/packages.pdf)
+
+* Additional References
+    * Edi Weitz Article on Packages vs Modules vs Systems - http://mirror.informatimago.com/lisp/weitz.de/packages.html
 
 * Symbols
   * built-in data type to represents names in CL
@@ -87,7 +94,8 @@ Packages
       flexibility.
 * Symbols found in package when package is loaded are interned into the 
   current package (meaning they are accessible with an additional qualifier)
-* Qualified vs Unqualified Names in packages    * Most names used are "unqualified" meaning they contain no colons
+* Qualified vs Unqualified Names in packages    
+* Most names used are "unqualified" meaning they contain no colons
       * When reader reads them in, first translates name to symbol, and 
         then calls INTERN for symbol lookup.
     * Qualified names are names that are interned in a different package
