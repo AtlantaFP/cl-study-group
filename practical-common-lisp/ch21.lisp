@@ -218,7 +218,7 @@ DEFPACKAGE - used to create new packages
 (in-package :package3)
 
 (defun another-function ()
-  (format t "calling utils:hello-world from another-function~%")
+  (format t "calling package1:hello-world from another-function~%")
   (hello-world))
 
 (defun sub (a b)
@@ -240,3 +240,5 @@ Final rules of thumb when creating packages
 - use of package.lisp 
 - use ASDF 
 |#
+
+
