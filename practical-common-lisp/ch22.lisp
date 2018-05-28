@@ -1,5 +1,8 @@
 #|
 Ch. 22: Loop for Black Belts
+https://github.com/atlantafp/cl-study-group
+
+@unxn3rd on Twitter
 
 Agenda
 * use case of loop
@@ -72,9 +75,11 @@ Generic form of counting loop
 (loop :for i :upto 10 :do (print i))
 (loop :for i :from 0 :upto 10 :do (print i))
 (loop :for i :below 11 :do (print i))
-(loop :for i :from 0 :below 11 :do (print i))
+(loop :for i :from 5 :below 11 :do (print i))
+(loop :for i :upfrom 0 :to 10 :do (print i))
 
 ;; the following uses equal-then iteration (more on this later) mixed with repeat
+;; (loop :for i :below 11 :d ...)
 (loop :repeat 11
    :for i = 0 :then (incf i)
    :do (print i))
@@ -88,11 +93,17 @@ Generic form of counting loop
 
 
 ;; same thing but decrementing
+;; to/upto/downto
+;; from/downfrom/upfrom
 (loop :for i :from 10 :downto 0 :do (print i))
 (loop :as i :from 10 :above -1 :do (print i))
 (loop :for i :downfrom 10 :to 0 :do (print i))
 (loop :for i :downfrom 10 :downto 0 :do (print i))
-(loop :for i :downfrom 10 :above -1 :do (print i))
+(loop :for i :downfrom 10 :above -1
+   :do
+   (print i)
+   (print (* i i)))
+   
 (loop :repeat 11
    :for i = 10 :then (decf i)
    :do (print i))
@@ -146,9 +157,9 @@ Iterating over Hash tables / Packages
 (defparameter *student-age-table* (make-hash-table :test #'equal))
 
 ;; population of table with some dummy data
-(setf (gethash "Ram" *student-age-table*) 34)
-(setf (gethash "Dave" *student-age-table*) 22)
-(setf (gethash "Steve" *student-age-table*) 17)
+(setf (gethash "Ram" *student-age-table*) 34
+      (gethash "Dave" *student-age-table*) 22
+      (gethash "Steve" *student-age-table*) 17)
 
 ;; examples of iterating through the hash table
 (loop :for k :being :each :hash-key :of *student-age-table*
@@ -170,6 +181,7 @@ Iterating over Hash tables / Packages
 (ql:quickload "hello-asdf")
 
 ;; loop through symbols in
+;; NOTE: update lisp explanation on symbol vs present-symbol vs external-symbol
 (loop :for sym :being :each :symbol :in :com.rv.utils :do (print sym))
 (loop :for sym :being :the :symbols :in :com.rv.utils :do (print sym))
 (loop :for sym :being :each :present-symbol :in :com.rv.utils :do (print sym))
@@ -217,6 +229,7 @@ Destructuring variables
 
 (destructuring-bind (a b &optional (c 'cee)) '(1 2)
   (list a b c))
+
 * loop gives you a similar feature to take a part values of list
 |#
 
@@ -226,9 +239,14 @@ Destructuring variables
 ;; we've also seen this as a way of display comma-separated lists
 ;; recall *simple-list* = (list 1 2 3 4 5 6 7 8 9 10)
 
-(loop :for (item . rest) :on *simple-list*
+(loop :for item :on *simple-list*
    :do (format t "~a" item)
+   :when (cdr item) :do (format t ", "))
+
+(loop :for (item1 item2 nil item4 . rest) :on *simple-list*
+   :do (format t "~a" item1)
    :when rest :do (format t ", "))
+
 
 #|
 Accumulation
@@ -239,11 +257,12 @@ Accumulation
 * can return accumulation (accumulates a default value and returns it) OR you can save it into
   a local variable (using :into subclause)
 * Types of Accumulation
-    * Numeric Accumulation (sum/summing, count/counting, maximize/maximizing, minimize/minimizing
+    * Numeric Accumulation (sum/summing, count/counting, maximize/maximizing, minimize/minimizing)
     * List Accumulation (collect/collecting, append/appending, nconc/nconcing)
 
 * Numeric Accumulation - deals with return a single value
 * List Accumulation - builds up ands returns a list
+
 |#
 
 ;; examples
@@ -252,7 +271,7 @@ Accumulation
 
 (defun flatten-list (alist)
   "flatten a list of lists using loop."
-  (loop :for item :in alist :nconc item))
+  (loop :for item :in alist :append item))
 
 (defun flatten-list (alist)
   (loop :for item :in alist
@@ -276,11 +295,14 @@ Accumulation
      :for item :in alist
      :with min-value = (car alist)
      :with max-value = 0
+     :when (< item min-value)
      :do
-     (when (< item min-value)
        (setf min-value item))
-     (when (> item max-value)
-       (setf max-value item))
+     :end
+     :when (> item max-value)
+     :do
+     (setf max-value item))
+     :end
      :count item into coll-size
      :sum item into coll-sum
      :finally (return-from range (values coll-size coll-sum min-value max-value))))
@@ -293,3 +315,17 @@ Accumulation
      :count item :into coll-size
      :sum item :into coll-sum
      :finally (return (values coll-size coll-sum min-value max-value))))
+
+(defun print-sum-values (alist)
+  (loop :for i :in alist
+     :if (evenp i)
+     :sum i into even-sum
+     :else
+     :sum i into odd-sum
+     :end
+     :finally (return (values even-sum odd-sum))))
+
+(defun another-sum-values (alist)
+  (values (reduce #'+ (remove-if-not #'evenp alist))
+p	  (reduce #'+ (remove-if-not #'oddp alist))))
+
